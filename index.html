@@ -68,7 +68,7 @@ canvas{position:absolute;top:0;left:0;display:block}
 <div id="ts"></div>
 
 <script>
-const NR=45, HG=800, WG=110;
+const NR=45, HG=800, WG=110; // --- تكبير الخطوط  المرتبطة  بالدوائر  ---
 let D = [], ST = {}, NM = {}, ROOT = null, POS = {}, imgCache = {};
 let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null, mnX, mxX, mnY, mxY;
 
@@ -163,6 +163,7 @@ function drawNodes(nd){
 
 function toS(wx,wy){ return {sx:(wx-mnX+NR*2)*sc+vx, sy:(wy-mnY+NR*2)*sc+vy}; }
 
+  // --- التكبير (الماوس) ---
 cw.addEventListener("wheel", e => {
     e.preventDefault();
     const rect = cw.getBoundingClientRect();
@@ -173,6 +174,46 @@ cw.addEventListener("wheel", e => {
     sc = nextSc; render();
 }, { passive: false });
 
+
+  // --- دعم الجوال (اللمس) ---
+cw.addEventListener("touchstart", e => {
+    if (e.touches.length === 1) {
+        drag = true;
+        ds = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        vs = { x: vx, y: vy };
+    } else if (e.touches.length === 2) {
+        drag = false; // التوقف عن السحب لبدء الزوم
+        lastTouchDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+    }
+}, { passive: false });
+
+cw.addEventListener("touchmove", e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && drag) {
+        vx = vs.x + (e.touches[0].clientX - ds.x);
+        vy = vs.y + (e.touches[0].clientY - ds.y);
+        render();
+    } else if (e.touches.length === 2) {
+        const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+        const zoom = dist / lastTouchDist;
+        
+        const rect = cw.getBoundingClientRect();
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+        const nextSc = Math.max(0.1, Math.min(5, sc * zoom));
+        vx = midX - (midX - vx) * (nextSc / sc);
+        vy = midY - (midY - vy) * (nextSc / sc);
+        
+        sc = nextSc;
+        lastTouchDist = dist;
+        render();
+    }
+}, { passive: false });
+
+cw.addEventListener("touchend", () => { drag = false; });
+  
+  
 function center(){
     const tW=mxX-mnX+NR*4, tH=mxY-mnY+NR*4;
     sc=Math.min(cw.clientWidth/tW, cw.clientHeight/tH, 1.5)*0.85;
