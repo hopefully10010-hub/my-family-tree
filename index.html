@@ -37,16 +37,11 @@ canvas{position:absolute;top:0;left:0;display:block}
 
 <header>
   <h1>🌳 شجرة أسرة القعير</h1>
-  <p>تحميل البيانات تلقائياً من الملف المرفق</p>
+  <p>من آل بو عليان · من العناقر · من بني قيم · من التميمي</p>
 </header>
 
 <div id="tb">
   <input id="sb" type="text" placeholder="🔍 بحث عن اسم..." oninput="doSearch(this.value)"/>
-  <button onclick="zIn()">➕ تكبير</button>
-  <button onclick="zOut()">➖ تصغير</button>
-  <button onclick="rView()">🏠 ضبط</button>
-  <button onclick="exportData()" style="background: #2980b9; color: #fff; border:none">💾 حفظ نسخة</button>
-  <button onclick="document.getElementById('importFile').click()" style="background: #8e44ad; color: #fff; border:none">📂 استيراد يدوي</button>
   <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none"/>
 </div>
 
