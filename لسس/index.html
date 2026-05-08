@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>شجرة أسرة القعير - النسخة الاحترافية بالزوم الذكي</title>
+<style>
+/* التنسيق العام */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0d0500;overflow:hidden;color:#fff}
+header{text-align:center;padding:14px 10px 6px}
+header h1{font-size:clamp(1.2rem,3.5vw,2rem);color:#f5c842;text-shadow:0 0 18px rgba(245,200,66,.6)}
+header p{color:#c9a84c;font-size:.8rem;margin-top:3px}
+
+/* شريط الأدوات */
+#tb{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;padding:6px 10px; background: rgba(245,200,66,0.05); border-bottom: 1px solid rgba(245,200,66,0.1)}
+#tb button, #tb input{background:rgba(245,200,66,0.1);border:1px solid #f5c842;color:#f5c842;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;outline:none; transition: 0.3s}
+#tb button:hover{background:rgba(245,200,66,0.3)}
+#sb{width:140px; color: #fff}
+#sb::placeholder{color: #888}
+
+/* منطقة الشجرة */
+#cw{width:100%;height:calc(100vh - 120px);position:relative;overflow:hidden;cursor:grab}
+#cw:active{cursor:grabbing}
+canvas{position:absolute;top:0;left:0;display:block}
+
+/* النوافذ المنبثقة */
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center}
+#ov.open{display:flex}
+#md{background:linear-gradient(145deg,#1e0e02,#2d1a06);border:2px solid #f5c842;border-radius:16px;width:min(450px,95vw);max-height:90vh;overflow-y:auto;padding:25px 20px;position:relative;box-shadow:0 0 35px rgba(245,200,66,0.3);animation:pop 0.2s ease}
+
+@keyframes pop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+
+.close-btn{position:absolute;top:10px;left:15px;background:none;border:none;color:#f5c842;font-size:1.5rem;cursor:pointer}
+#mnm{text-align:center;font-size:1.4rem;font-weight:bold;color:#f5c842;margin-bottom:5px}
+
+.section-label{font-size: 0.75rem; color: #c9a84c; margin-top: 15px; margin-bottom: 8px; display: block; border-bottom: 1px solid rgba(245,200,66,0.2); padding-bottom: 3px;}
+.action-btn{width:100%; padding:10px; border-radius:10px; font-size:0.85rem; cursor:pointer; margin-top:8px; border:1px solid #f5c842; transition: 0.3s; display: block; text-align: center}
+.save-btn{background:linear-gradient(90deg,#c9a84c,#f5c842); color:#1a0a00; border:none; font-weight:bold}
+.add-child-btn{background:rgba(34, 139, 34, 0.2); color:#4caf50; border-color:#4caf50}
+.del-btn{background:rgba(220, 53, 69, 0.1); color:#dc3545; border-color:#dc3545}
+/* التحم بحجم الصورة من هنا*/
+#pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-bottom:10px}
+.pc{position:relative;border-radius:8px;overflow:hidden;border:1px solid #f5c842;aspect-ratio:2/3;background:#111} 
+.pc img{width:100%;height:100%;object-fit:cover}
+.db{position:absolute;top:2px;left:2px;background:rgba(220,0,0,0.8);border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer}
+
+input.child-input, textarea.info-text{width:100%; background:rgba(0,0,0,0.3); color:#fff; border:1px solid #444; border-radius:8px; padding:10px; outline:none}
+
+#ts{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#f5c842;color:#1a0a00;padding:8px 20px;border-radius:20px;font-size:0.85rem;font-weight:bold;opacity:0;pointer-events:none;transition:0.3s;z-index:2000}
+#ts.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌳 شجرة أسرة القعير</h1>
+  <p>من آل بو عليان · من العناقر · من بني قيم · من التميمي</p>
+</header>
+
+<div id="tb">
+  <input id="sb" type="text" placeholder="🔍 بحث عن اسم..." oninput="doSearch(this.value)"/>
+  <button onclick="zIn()">➕ تكبير</button>
+  <button onclick="zOut()">➖ تصغير</button>
+  <button onclick="rView()">🏠 ضبط</button>
+  <button onclick="exportData()" style="background: #2980b9; color: #fff; border:none">💾 تصدير نسخة</button>
+  <button onclick="document.getElementById('importFile').click()" style="background: #8e44ad; color: #fff; border:none">📂 استيراد نسخة</button>
+  <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none"/>
+</div>
+
+<div id="cw"><canvas id="cv"></canvas></div>
+
+<div id="ov">
+  <div id="md">
+    <button class="close-btn" onclick="closeMd()">✕</button>
+    <div id="mnm"></div>
+    <div id="mln" style="text-align:center; color:#c9a84c; font-size:0.75rem; margin-bottom:15px"></div>
+    
+    <span class="section-label">معرض الصور</span>
+    <div id="pg"></div>
+    <button class="action-btn" style="background:rgba(245,200,66,0.1); border-style:dashed" onclick="document.getElementById('fi').click()">📷 إضافة صور</button>
+    <input type="file" id="fi" accept="image/*" multiple onchange="addPhotos(event)" style="display:none"/>
+    
+    <span class="section-label">المعلومات الإضافية</span>
+    <textarea id="tx" class="info-text" placeholder="تاريخ الميلاد، السيرة..."></textarea>
+    <button class="action-btn save-btn" onclick="saveInfo()">💾 حفظ المعلومات</button>
+
+    <span class="section-label">إضافة ابن لـ <span id="parentNameLabel"></span></span>
+    <div style="display:flex; gap:8px">
+        <input id="childNameInput" class="child-input" type="text" placeholder="اسم الابن">
+        <button class="action-btn add-child-btn" style="margin-top:0; width:100px" onclick="addChild()">إضافة</button>
+    </div>
+
+    <span class="section-label">إدارة الفرد</span>
+    <button class="action-btn del-btn" onclick="deletePerson()">🗑️ حذف الفرد وذريته</button>
+  </div>
+</div>
+
+<div id="ts"></div>
+
+<script>
+// --- التحكم بحجم الدوائر---
+const NR=40, HG=800, WG=100;
+const defaultD = [
+  {i:"T0",n:"التميمي",p:null},
+  {i:"T1",n:"العنقري",p:"T0"},
+  {i:"T2",n:"آل بوعليان",p:"T1"},
+  {i:"T3",n:"القعير",p:"T2"},
+  {i:"T4",n:"إبراهيم",p:"T3"},
+  {i:"A1",n:"عثمان",p:"T4"},
+  {i:"A2",n:"صالح",p:"T4"},
+  {i:"B1",n:"إبراهيم",p:"A1"},
+  {i:"B2",n:"سام",p:"A1"},
+  {i:"B3",n:"فهد",p:"A1"},
+  {i:"B4",n:"عبدالله",p:"A1"},
+  {i:"C1",n:"صالح",p:"B1"},
+  {i:"C2",n:"عثمان",p:"B1"},
+  {i:"C3",n:"فيصل",p:"B1"},
+  {i:"C4",n:"محمد",p:"B1"},
+  {i:"C5",n:"خالد",p:"B1"},
+  {i:"D1",n:"أحمد",p:"C1"},
+  {i:"D2",n:"سالم",p:"C1"},
+  {i:"D3",n:"إبراهيم",p:"C1"},
+  {i:"D4",n:"عبدالله",p:"C1"},
+  {i:"D5",n:"سليمان",p:"C2"},
+  {i:"D6",n:"فراس",p:"C2"},
+  {i:"D7",n:"أحمد",p:"C2"},
+  {i:"D8",n:"صالح",p:"C2"},
+  {i:"D9",n:"عبدالعزيز",p:"C3"},
+  {i:"D10",n:"محمد",p:"C3"},
+  {i:"D11",n:"إبراهيم",p:"C3"},
+  {i:"D12",n:"زياد",p:"C5"},
+  {i:"D13",n:"فهد",p:"C5"},
+  {i:"D14",n:"عبدالرحمن",p:"C5"},
+  {i:"E1",n:"تركي",p:"D1"},
+  {i:"E2",n:"عمر",p:"D1"},
+  {i:"E3",n:"يوسف",p:"D2"},
+  {i:"E4",n:"فارس",p:"D2"},
+  {i:"E5",n:"زيد",p:"D2"},
+  {i:"E6",n:"ريان",p:"D3"},
+  {i:"E7",n:"سلطان",p:"D3"},
+  {i:"E8",n:"فيصل",p:"D4"},
+  {i:"E9",n:"بندر",p:"D4"},
+  {i:"F1",n:"إبراهيم",p:"B2"},
+  {i:"F2",n:"محمد",p:"B2"},
+  {i:"F3",n:"عبدالله",p:"B2"},
+  {i:"G1",n:"سلطان",p:"B3"},
+  {i:"G2",n:"تركي",p:"B3"},
+  {i:"G3",n:"ناصر",p:"B3"},
+  {i:"G4",n:"خالد",p:"B3"},
+  {i:"H1",n:"صالح",p:"B4"},
+  {i:"H2",n:"أحمد",p:"B4"},
+  {i:"H3",n:"طارق",p:"B4"},
+  {i:"A3",n:"سالم",p:"A2"},
+  {i:"A4",n:"صالح",p:"A3"},
+  {i:"J1",n:"إبراهيم",p:"A4"},
+  {i:"J2",n:"سالم",p:"A4"},
+  {i:"J3",n:"محمد",p:"A4"},
+  {i:"K1",n:"عبدالله",p:"J1"},
+  {i:"K2",n:"صالح",p:"J1"},
+  {i:"K6",n:"وليد",p:"J3"},
+  {i:"K7",n:"مازن",p:"J3"},
+  {i:"v1",n:"إبراهيم",p:"K1"},
+  {i:"v2",n:"محمد",p:"K1"},
+  {i:"v3",n:"علي",p:"K1"},
+  {i:"v4",n:"عبد الرحمن",p:"K1"},
+  {i:"x1",n:"أحمد",p:"v1"},
+  {i:"x2",n:"فهد",p:"v1"},
+  {i:"x3",n:"خالد",p:"v1"},
+  {i:"x4",n:"وليد",p:"v1"},
+  {i:"x5",n:"ماجد",p:"v1"},
+  {i:"x6",n:"عبدالله",p:"v1"},
+  {i:"x7",n:"إبراهيم",p:"x1"},
+  {i:"x8",n:"محمد",p:"x1"},
+];
+
+let D = JSON.parse(localStorage.getItem('family_tree_data')) || defaultD;
+let ST = JSON.parse(localStorage.getItem('qv5')) || {};
+let NM = {}, ROOT = null, POS = {}, DC = {}, imgCache = {};
+let mnX, mxX, mnY, mxY;
+
+const cw=document.getElementById("cw"), cv=document.getElementById("cv"), cx=cv.getContext("2d");
+let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null;
+
+// --- بناء الشجرة وتوزيعها ---
+function buildTree() {
+    NM = {}; DC = {}; POS = {};
+    D.forEach(x => { NM[x.i] = { ...x, ch: [] }; });
+    ROOT = null;
+    D.forEach(x => {
+        if (x.p && NM[x.p]) NM[x.p].ch.push(NM[x.i]);
+        else if (!x.p) ROOT = NM[x.i];
+    });
+    layout(ROOT, 0, 0);
+    calcBounds();
+}
+
+function layout(nd, d, l){
+    if(!nd) return l;
+    if(!nd.ch.length){ POS[nd.i]={x:l+NR,y:d*HG+NR*2}; return l+NR*2; }
+    let c=l;
+    nd.ch.forEach(ch=>{ c=layout(ch,d+1,c)+WG; });
+    c-=WG;
+    const fx=POS[nd.ch[0].i].x;
+    const lx=POS[nd.ch[nd.ch.length-1].i].x;
+    POS[nd.i]={x:(fx+lx)/2,y:d*HG+NR*2};
+    return c;
+}
+
+function calcBounds() {
+    mnX=1e9, mxX=-1e9, mnY=1e9, mxY=-1e9;
+    Object.values(POS).forEach(p=>{
+        if(p.x<mnX)mnX=p.x; if(p.x>mxX)mxX=p.x;
+        if(p.y<mnY)mnY=p.y; if(p.y>mxY)mxY=p.y;
+    });
+}
+
+// --- الرسم (Canvas) ---
+function render(){
+    cv.width=cw.clientWidth; cv.height=cw.clientHeight;
+    cx.fillStyle = "#0d0500"; cx.fillRect(0,0,cv.width,cv.height);
+    if(ROOT) { drawEdges(ROOT); drawNodes(ROOT); }
+}
+
+function drawEdges(nd){
+    const p=POS[nd.i]; // إحداثيات الأب
+    nd.ch.forEach(c=>{ // لكل ابن موجود في مصفوفة الأبناء
+        const cp=POS[c.i]; // إحداثيات الابن
+        const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y); // تحويل الإحداثيات لتناسب الزوم والمكان الحالي
+
+        cx.beginPath(); 
+        // 1. نقطة البداية: من منتصف أسفل دائرة الأب
+        cx.moveTo(ps.sx, ps.sy + NR * sc); 
+
+        // 2. رسم المنحنى (Bezier Curve) ليعطي شكل "عضوي" وانسيابي
+        cx.bezierCurveTo(
+            ps.sx, (ps.sy + cs.sy) / 2, // نقطة التحكم الأولى
+            cs.sx, (ps.sy + cs.sy) / 2, // نقطة التحكم الثانية
+            cs.sx, cs.sy - NR * sc      // نقطة النهاية (أعلى دائرة الابن)
+        );
+
+        // 3. خصائص الخط (اللون والسمك)
+        cx.strokeStyle = "rgba(245,200,66,0.18)"; // لون الخط (ذهبي شفاف)
+        cx.lineWidth = Math.max(1, 1.5 * sc);     // سمك الخط (يتغير مع الزوم)
+        
+        cx.stroke(); // تنفيذ الرسم
+        drawEdges(c); // تكرار العملية لأبناء الابن (الاستدعاء الذاتي)
+    });
+}
+
+function drawNodes(nd){
+    const p=POS[nd.i]; const {sx,sy}=toS(p.x,p.y); const r=NR*sc;
+    const isH=nd.i===HL; const s = ST[nd.i];
+    
+    // الاسم فوق الدائرة
+    cx.fillStyle="#fff"; cx.font=`bold ${Math.max(10, 12*sc)}px Tahoma`; cx.textAlign="center";
+    cx.fillText(nd.n, sx, sy - r - 10*sc);
+
+    cx.save();
+    if(s && s.photos && s.photos.length > 0) {
+        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.clip();
+        if(!imgCache[nd.i]) { imgCache[nd.i] = new Image(); imgCache[nd.i].src = s.photos[0]; }
+        try { cx.drawImage(imgCache[nd.i], sx-r, sy-r, r*2, r*2); } catch(e){}
+        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
+        cx.strokeStyle = isH ? "#fff" : "#4a90d9";
+        cx.lineWidth = 2.5*sc; cx.stroke();
+    } else {
+        let col = !nd.p ? "#f5c842" : (nd.ch.length > 0 ? "#c9a84c" : "#228B22");
+        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
+        cx.fillStyle=col; cx.fill();
+        cx.strokeStyle = isH ? "#fff" : "rgba(255,255,255,0.2)";
+        cx.lineWidth = isH ? 4*sc : 1.5*sc; cx.stroke();
+    }
+    cx.restore();
+    nd.ch.forEach(c=>drawNodes(c));
+}
+
+function toS(wx,wy){ return {sx:(wx-mnX+NR*2)*sc+vx, sy:(wy-mnY+NR*2)*sc+vy}; }
+
+// --- وظيفة الـ Scroll Wheel الجديدة ---
+cw.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = cw.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    // تحديد اتجاه الزوم (للداخل أو للخارج)
+    const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+    const nextSc = Math.max(0.1, Math.min(5, sc * zoomFactor));
+
+    // معادلة التكبير باتجاه الماوس
+    vx = mouseX - (mouseX - vx) * (nextSc / sc);
+    vy = mouseY - (mouseY - vy) * (nextSc / sc);
+    sc = nextSc;
+
+    render();
+}, { passive: false });
+
+// --- بقية التفاعلات ---
+function center(){
+    const tW=mxX-mnX+NR*4, tH=mxY-mnY+NR*4;
+    sc=Math.min(cw.clientWidth/tW, cw.clientHeight/tH, 1.5)*0.85;
+    vx=(cw.clientWidth-tW*sc)/2; vy=(cw.clientHeight-tH*sc)/2;
+    render();
+}
+
+cw.addEventListener("mousedown",e=>{ drag=true; ds={x:e.clientX,y:e.clientY}; vs={x:vx,y:vy}; });
+window.addEventListener("mousemove",e=>{ if(!drag)return; vx=vs.x+(e.clientX-ds.x); vy=vs.y+(e.clientY-ds.y); render(); });
+window.addEventListener("mouseup",()=>drag=false);
+cw.addEventListener("click",e=>{
+    if(Math.abs(e.clientX-ds.x)>5 || Math.abs(e.clientY-ds.y)>5) return;
+    const r=cw.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+    for(const id in POS){
+        const {sx,sy}=toS(POS[id].x, POS[id].y);
+        if(Math.hypot(mx-sx, my-sy) <= NR*sc+5){ openMd(id); return; }
+    }
+});
+
+function zIn(){
+    const cx_win = cw.clientWidth/2, cy_win = cw.clientHeight/2;
+    const nextSc = Math.min(5, sc * 1.2);
+    vx = cx_win - (cx_win - vx) * (nextSc / sc);
+    vy = cy_win - (cy_win - vy) * (nextSc / sc);
+    sc = nextSc; render();
+}
+function zOut(){
+    const cx_win = cw.clientWidth/2, cy_win = cw.clientHeight/2;
+    const nextSc = Math.max(0.1, sc * 0.8);
+    vx = cx_win - (cx_win - vx) * (nextSc / sc);
+    vy = cy_win - (cy_win - vy) * (nextSc / sc);
+    sc = nextSc; render();
+}
+function rView(){ center(); }
+
+// --- الإدارة (صور، إضافة، حذف، تصدير) ---
+function exportData() {
+    const data = { family: D, storage: ST };
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `شجرة_القعير_${new Date().toLocaleDateString()}.json`;
+    a.click();
+}
+
+function importData(e) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const imp = JSON.parse(ev.target.result);
+        D = imp.family; ST = imp.storage;
+        localStorage.setItem('family_tree_data', JSON.stringify(D));
+        localStorage.setItem('qv5', JSON.stringify(ST));
+        buildTree(); center(); toast("تمت الاستعادة ✓");
+    };
+    reader.readAsText(e.target.files[0]);
+}
+
+function addChild() {
+    const name = document.getElementById("childNameInput").value.trim();
+    if(!name) return;
+    D.push({ i: "N"+Date.now(), n: name, p: CID });
+    localStorage.setItem('family_tree_data', JSON.stringify(D));
+    buildTree(); render(); toast("تمت الإضافة");
+}
+
+function deletePerson() {
+    if(!CID || !NM[CID].p) return toast("لا يمكن حذف الأصل");
+    if(!confirm("حذف الفرد وذريته؟")) return;
+    let ids = []; function collect(nd){ ids.push(nd.i); nd.ch.forEach(collect); }
+    collect(NM[CID]);
+    D = D.filter(x => !ids.includes(x.i));
+    localStorage.setItem('family_tree_data', JSON.stringify(D));
+    buildTree(); render(); closeMd();
+}
+
+function saveInfo() {
+    if(!ST[CID]) ST[CID] = { photos:[], info: "" };
+    ST[CID].info = document.getElementById("tx").value;
+    localStorage.setItem('qv5', JSON.stringify(ST));
+    toast("تم الحفظ ✓");
+}
+
+function openMd(id){
+    CID=id; const nd=NM[id];
+    document.getElementById("mnm").textContent=nd.n;
+    document.getElementById("parentNameLabel").textContent=nd.n;
+    document.getElementById("tx").value = ST[id]?.info || "";
+    document.getElementById("ov").classList.add("open");
+    buildGrid(id);
+}
+
+function addPhotos(e) {
+    if (!ST[CID]) ST[CID] = { photos: [], info: "" };
+    const files = Array.from(e.target.files);
+    let count = 0;
+    files.forEach(f => {
+        const reader = new FileReader();
+        reader.onload = ev => {
+            ST[CID].photos.push(ev.target.result);
+            if (++count === files.length) {
+                localStorage.setItem('qv5', JSON.stringify(ST));
+                delete imgCache[CID]; buildGrid(CID); render();
+            }
+        };
+        reader.readAsDataURL(f);
+    });
+}
+
+function buildGrid(id) {
+    const grid = document.getElementById("pg"); grid.innerHTML = "";
+    ST[id]?.photos?.forEach((src, idx) => {
+        const div = document.createElement("div"); div.className = "pc";
+        div.innerHTML = `<img src="${src}"><button class="db" onclick="delImg(${idx})">✕</button>`;
+        grid.appendChild(div);
+    });
+}
+
+function delImg(idx) { ST[CID].photos.splice(idx, 1); delete imgCache[CID]; buildGrid(CID); render(); }
+function closeMd() { document.getElementById("ov").classList.remove("open"); }
+function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
+function doSearch(v){
+    if(!v.trim()) { HL=null; render(); return; }
+    const f = D.find(x => x.n.includes(v.trim()));
+    if(f) { HL=f.i; const p=POS[f.i]; vx=cw.clientWidth/2-(p.x-mnX+NR*2)*sc; vy=cw.clientHeight/2-(p.y-mnY+NR*2)*sc; render(); }
+}
+
+buildTree();
+window.addEventListener("load", center);
+window.addEventListener("resize", render);
+</script>
+</body>
+</html>
