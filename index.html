@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>شجرة أسرة القعير - النسخة الرسمية</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0d0500;overflow:hidden;color:#fff}
+header{text-align:center;padding:14px 10px 6px}
+header h1{font-size:clamp(1.2rem,3.5vw,2rem);color:#f5c842;text-shadow:0 0 18px rgba(245,200,66,.6)}
+header p{color:#c9a84c;font-size:.8rem;margin-top:3px}
+#tb{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;padding:6px 10px; background: rgba(255,255,255,0.03)}
+#tb button, #tb input{background:rgba(245,200,66,0.15);border:1px solid #f5c842;color:#f5c842;padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;outline:none; transition: 0.3s}
+#tb button:hover{background:rgba(245,200,66,0.3)}
+#sb{width:140px; color: #fff}
+#cw{width:100%;height:calc(100vh - 120px);position:relative;overflow:hidden;cursor:grab}
+canvas{position:absolute;top:0;left:0;display:block}
+#ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center}
+#ov.open{display:flex}
+#md{background:linear-gradient(145deg,#1e0e02,#2d1a06);border:2px solid #f5c842;border-radius:16px;width:min(450px,95vw);max-height:90vh;overflow-y:auto;padding:25px 20px;position:relative;box-shadow:0 0 35px rgba(245,200,66,0.3);animation:pop 0.2s ease}
+@keyframes pop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+.close-btn{position:absolute;top:10px;left:15px;background:none;border:none;color:#f5c842;font-size:1.5rem;cursor:pointer}
+#mnm{text-align:center;font-size:1.4rem;font-weight:bold;color:#f5c842;margin-bottom:5px}
+.section-label{font-size: 0.75rem; color: #c9a84c; margin-top: 15px; margin-bottom: 8px; display: block; border-bottom: 1px solid rgba(245,200,66,0.2); padding-bottom: 3px;}
+.action-btn{width:100%; padding:10px; border-radius:10px; font-size:0.85rem; cursor:pointer; margin-top:8px; border:1px solid #f5c842; transition: 0.3s; display: block; text-align: center}
+.save-btn{background:linear-gradient(90deg,#c9a84c,#f5c842); color:#1a0a00; border:none; font-weight:bold}
+#pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:10px}
+.pc{position:relative;border-radius:8px;overflow:hidden;border:1px solid #f5c842;aspect-ratio:1;background:#111}
+.pc img{width:100%;height:100%;object-fit:cover}
+.db{position:absolute;top:2px;left:2px;background:rgba(220,0,0,0.8);border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer}
+#ts{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#f5c842;color:#1a0a00;padding:8px 20px;border-radius:20px;font-size:0.85rem;font-weight:bold;opacity:0;pointer-events:none;transition:0.3s;z-index:2000}
+#ts.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌳 شجرة أسرة القعير</h1>
+  <p>تحميل البيانات تلقائياً من الملف المرفق</p>
+</header>
+
+<div id="tb">
+  <input id="sb" type="text" placeholder="🔍 بحث عن اسم..." oninput="doSearch(this.value)"/>
+  <button onclick="zIn()">➕ تكبير</button>
+  <button onclick="zOut()">➖ تصغير</button>
+  <button onclick="rView()">🏠 ضبط</button>
+  <button onclick="exportData()" style="background: #2980b9; color: #fff; border:none">💾 حفظ نسخة</button>
+  <button onclick="document.getElementById('importFile').click()" style="background: #8e44ad; color: #fff; border:none">📂 استيراد يدوي</button>
+  <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none"/>
+</div>
+
+<div id="cw"><canvas id="cv"></canvas></div>
+
+<div id="ov">
+  <div id="md">
+    <button class="close-btn" onclick="closeMd()">✕</button>
+    <div id="mnm"></div>
+    <div id="mln" style="text-align:center; color:#c9a84c; font-size:0.75rem; margin-bottom:15px"></div>
+    <div id="pg"></div>
+    <button class="action-btn" style="background:rgba(245,200,66,0.1); border-style:dashed" onclick="document.getElementById('fi').click()">📷 إضافة صور</button>
+    <input type="file" id="fi" accept="image/*" multiple onchange="addPhotos(event)" style="display:none"/>
+    <span class="section-label">المعلومات الشخصية</span>
+    <textarea id="tx" style="width:100%; background:#111; color:#fff; border:1px solid #444; border-radius:8px; padding:10px" placeholder="السيرة..."></textarea>
+    <button class="action-btn save-btn" onclick="saveInfo()">💾 حفظ</button>
+  </div>
+</div>
+<div id="ts"></div>
+
+<script>
+const NR=45, HG=140, WG=110;
+let D = [], ST = {}, NM = {}, ROOT = null, POS = {}, imgCache = {};
+let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null, mnX, mxX, mnY, mxY;
+
+const cw=document.getElementById("cw"), cv=document.getElementById("cv"), cx=cv.getContext("2d");
+
+// --- الوظيفة السحرية: تحميل ملف JSON تلقائياً ---
+async function loadAutoData() {
+    try {
+        // سيقوم المتصفح بالبحث عن هذا الملف في نفس المجلد
+        const response = await fetch('شجرة_القعير_5_8_2026.json');
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        D = data.family;
+        ST = data.storage;
+        toast("تم تحميل بيانات الأسرة والصور تلقائياً ✓");
+    } catch (e) {
+        toast("لم يتم العثور على ملف البيانات، يرجى الاستيراد يدوياً");
+        D = [{i:"T0",n:"التميمي",p:null}]; // افتراضي
+    }
+    buildTree();
+    center();
+}
+
+function buildTree() {
+    NM = {}; POS = {};
+    D.forEach(x => { NM[x.i] = { ...x, ch: [] }; });
+    ROOT = null;
+    D.forEach(x => {
+        if (x.p && NM[x.p]) NM[x.p].ch.push(NM[x.i]);
+        else if (!x.p) ROOT = NM[x.i];
+    });
+    layout(ROOT, 0, 0);
+    calcBounds();
+}
+
+function layout(nd, d, l){
+    if(!nd) return l;
+    if(!nd.ch.length){ POS[nd.i]={x:l+NR,y:d*HG+NR*2}; return l+NR*2; }
+    let c=l; nd.ch.forEach(ch=>{ c=layout(ch,d+1,c)+WG; });
+    c-=WG;
+    const fx=POS[nd.ch[0].i].x, lx=POS[nd.ch[nd.ch.length-1].i].x;
+    POS[nd.i]={x:(fx+lx)/2,y:d*HG+NR*2};
+    return c;
+}
+
+function calcBounds() {
+    mnX=1e9, mxX=-1e9, mnY=1e9, mxY=-1e9;
+    Object.values(POS).forEach(p=>{
+        if(p.x<mnX)mnX=p.x; if(p.x>mxX)mxX=p.x;
+        if(p.y<mnY)mnY=p.y; if(p.y>mxY)mxY=p.y;
+    });
+}
+
+function render(){
+    cv.width=cw.clientWidth; cv.height=cw.clientHeight;
+    cx.fillStyle = "#0d0500"; cx.fillRect(0,0,cv.width,cv.height);
+    if(ROOT) { drawEdges(ROOT); drawNodes(ROOT); }
+}
+
+function drawEdges(nd){
+    const p=POS[nd.i];
+    nd.ch.forEach(c=>{
+        const cp=POS[c.i];
+        const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y);
+        cx.beginPath(); cx.moveTo(ps.sx, ps.sy+NR*sc);
+        cx.bezierCurveTo(ps.sx, (ps.sy+cs.sy)/2, cs.sx, (ps.sy+cs.sy)/2, cs.sx, cs.sy-NR*sc);
+        cx.strokeStyle="rgba(245,200,66,0.2)"; cx.lineWidth=1.5*sc; cx.stroke();
+        drawEdges(c);
+    });
+}
+
+function drawNodes(nd){
+    const p=POS[nd.i]; const {sx,sy}=toS(p.x,p.y); const r=NR*sc;
+    const isH=nd.i===HL, s = ST[nd.i];
+    cx.fillStyle="#fff"; cx.font=`bold ${Math.max(11, 13*sc)}px Tahoma`; cx.textAlign="center";
+    cx.fillText(nd.n, sx, sy - r - 12*sc);
+    cx.save();
+    if(s && s.photos && s.photos.length > 0) {
+        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.clip();
+        if(!imgCache[nd.i]) { imgCache[nd.i] = new Image(); imgCache[nd.i].src = s.photos[0]; }
+        try { cx.drawImage(imgCache[nd.i], sx-r, sy-r, r*2, r*2); } catch(e){}
+        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
+        cx.strokeStyle = isH ? "#fff" : "#4a90d9"; cx.lineWidth = 3*sc; cx.stroke();
+    } else {
+        let col = !nd.p ? "#f5c842" : (nd.ch.length > 0 ? "#c9a84c" : "#228B22");
+        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.fillStyle=col; cx.fill();
+        cx.strokeStyle = isH ? "#fff" : "rgba(255,255,255,0.2)"; cx.lineWidth = isH ? 4*sc : 2*sc; cx.stroke();
+    }
+    cx.restore();
+    nd.ch.forEach(c=>drawNodes(c));
+}
+
+function toS(wx,wy){ return {sx:(wx-mnX+NR*2)*sc+vx, sy:(wy-mnY+NR*2)*sc+vy}; }
+
+cw.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = cw.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const zoom = e.deltaY < 0 ? 1.1 : 0.9;
+    const nextSc = Math.max(0.1, Math.min(5, sc * zoom));
+    vx = mx - (mx - vx) * (nextSc / sc); vy = my - (my - vy) * (nextSc / sc);
+    sc = nextSc; render();
+}, { passive: false });
+
+function center(){
+    const tW=mxX-mnX+NR*4, tH=mxY-mnY+NR*4;
+    sc=Math.min(cw.clientWidth/tW, cw.clientHeight/tH, 1.5)*0.85;
+    vx=(cw.clientWidth-tW*sc)/2; vy=(cw.clientHeight-tH*sc)/2;
+    render();
+}
+
+cw.addEventListener("mousedown",e=>{ drag=true; ds={x:e.clientX,y:e.clientY}; vs={x:vx,y:vy}; });
+window.addEventListener("mousemove",e=>{ if(!drag)return; vx=vs.x+(e.clientX-ds.x); vy=vs.y+(e.clientY-ds.y); render(); });
+window.addEventListener("mouseup",()=>drag=false);
+cw.addEventListener("click",e=>{
+    if(Math.abs(e.clientX-ds.x)>5) return;
+    const r=cw.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
+    for(const id in POS){
+        const {sx,sy}=toS(POS[id].x, POS[id].y);
+        if(Math.hypot(mx-sx, my-sy) <= NR*sc+5){ openMd(id); return; }
+    }
+});
+
+function openMd(id){
+    CID=id; const nd=NM[id];
+    document.getElementById("mnm").textContent=nd.n;
+    document.getElementById("tx").value = ST[id]?.info || "";
+    document.getElementById("ov").classList.add("open");
+    buildGrid(id);
+}
+
+function buildGrid(id) {
+    const grid = document.getElementById("pg"); grid.innerHTML = "";
+    ST[id]?.photos?.forEach((src, idx) => {
+        const div = document.createElement("div"); div.className = "pc";
+        div.innerHTML = `<img src="${src}"><button class="db" onclick="delImg(${idx})">✕</button>`;
+        grid.appendChild(div);
+    });
+}
+
+function closeMd() { document.getElementById("ov").classList.remove("open"); }
+function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
+
+// تشغيل التحميل التلقائي عند البداية
+loadAutoData();
+window.addEventListener("resize", render);
+</script>
+</body>
+</html>
