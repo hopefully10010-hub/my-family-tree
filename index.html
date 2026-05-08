@@ -130,7 +130,7 @@ function drawEdges(nd){
         const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y);
         cx.beginPath(); cx.moveTo(ps.sx, ps.sy+NR*sc);
         cx.bezierCurveTo(ps.sx, (ps.sy+cs.sy)/2, cs.sx, (ps.sy+cs.sy)/2, cs.sx, cs.sy-NR*sc);
-        cx.strokeStyle="rgba(245,200,66,0.2)"; cx.lineWidth=1.5*sc; cx.stroke();
+        cx.strokeStyle="rgba(245,200,66,0.2)"; cx.lineWidth=2.5*sc; cx.stroke();
         drawEdges(c);
     });
 }
