@@ -177,6 +177,27 @@ function drawNodes(nd){
 
 function toS(wx,wy){ return {sx:(wx-mnX+NR*2)*sc+vx, sy:(wy-mnY+NR*2)*sc+vy}; }
 
+
+
+// --- وظيفة فتح النافذة وسلسلة النسب ---
+function openMd(id){
+    CID=id; const nd=NM[id];
+    document.getElementById("mnm").textContent=nd.n;
+
+    // تتبع النسب (Breadcrumbs)
+    let path = [];
+    let curr = nd;
+    while(curr) {
+        path.push(curr.n);
+        curr = curr.p ? NM[curr.p] : null;
+    }
+    document.getElementById("mln").textContent = path.reverse().join(" ← ");
+
+    document.getElementById("tx").value = ST[id]?.info || "";
+    document.getElementById("ov").classList.add("open");
+    buildGrid(id);
+}
+  
   // --- التكبير (الماوس) ---
 cw.addEventListener("wheel", e => {
     e.preventDefault();
