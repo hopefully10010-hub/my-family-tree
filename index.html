@@ -264,10 +264,6 @@ function buildGrid(id) {
     });
 }
 
-function closeMd() { document.getElementById("ov").classList.remove("open"); }
-function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
-
-
 
 // --- وظيفة فتح النافذة وسلسلة النسب ---
 function openMd(id){
@@ -288,6 +284,9 @@ function openMd(id){
     buildGrid(id);
 }
 
+  
+function closeMd() { document.getElementById("ov").classList.remove("open"); }
+function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
 
   
 // تشغيل التحميل التلقائي عند البداية
