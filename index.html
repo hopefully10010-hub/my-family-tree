@@ -72,19 +72,19 @@ let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null,
 
 const cw=document.getElementById("cw"), cv=document.getElementById("cv"), cx=cv.getContext("2d");
 
-// --- الوظيفة السحرية: تحميل ملف JSON تلقائياً ---
+
+// --- تحميل البيانات تلقائياً ---
 async function loadAutoData() {
     try {
-        // سيقوم المتصفح بالبحث عن هذا الملف في نفس المجلد
         const response = await fetch('شجرة_القعير_5_8_2026.json');
         if (!response.ok) throw new Error();
         const data = await response.json();
         D = data.family;
-        ST = data.storage;
-        toast("تم تحميل بيانات الأسرة والصور تلقائياً ✓");
+        ST = data.storage || {};
+        toast("تمت مزامنة البيانات تلقائياً ✓");
     } catch (e) {
-        toast("لم يتم العثور على ملف البيانات، يرجى الاستيراد يدوياً");
-        D = [{i:"T0",n:"التميمي",p:null}]; // افتراضي
+        toast("يرجى اختيار ملف JSON للاستيراد");
+        D = [{i:"T0",n:"التميمي",p:null}]; 
     }
     buildTree();
     center();
@@ -100,6 +100,7 @@ function buildTree() {
     });
     layout(ROOT, 0, 0);
     calcBounds();
+    render();
 }
 
 function layout(nd, d, l){
@@ -119,65 +120,54 @@ function calcBounds() {
         if(p.y<mnY)mnY=p.y; if(p.y>mxY)mxY=p.y;
     });
 }
-// --- الرسم (Canvas) ---
+
 function render(){
     cv.width=cw.clientWidth; cv.height=cw.clientHeight;
     cx.fillStyle = "#0d0500"; cx.fillRect(0,0,cv.width,cv.height);
     if(ROOT) { drawEdges(ROOT); drawNodes(ROOT); }
 }
 
-
 function drawEdges(nd){
-    const p=POS[nd.i]; // إحداثيات الأب
-    nd.ch.forEach(c=>{ // لكل ابن موجود في مصفوفة الأبناء
-        const cp=POS[c.i]; // إحداثيات الابن
-        const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y); // تحويل الإحداثيات لتناسب الزوم والمكان الحالي
-
-        cx.beginPath(); 
-        // 1. نقطة البداية: من منتصف أسفل دائرة الأب
-        cx.moveTo(ps.sx, ps.sy + NR * sc); 
-
-        // 2. رسم المنحنى (Bezier Curve) ليعطي شكل "عضوي" وانسيابي
-        cx.bezierCurveTo(
-            ps.sx, (ps.sy + cs.sy) / 2, // نقطة التحكم الأولى
-            cs.sx, (ps.sy + cs.sy) / 2, // نقطة التحكم الثانية
-            cs.sx, cs.sy - NR * sc      // نقطة النهاية (أعلى دائرة الابن)
-        );
-
-        // 3. خصائص الخط (اللون والسمك)
-        cx.strokeStyle = "rgba(245,200,66,0.18)"; // لون الخط (ذهبي شفاف)
-        cx.lineWidth = Math.max(1, 5 * sc);     // سمك الخط (يتغير مع الزوم)
-        
-        cx.stroke(); // تنفيذ الرسم
-        drawEdges(c); // تكرار العملية لأبناء الابن (الاستدعاء الذاتي)
+    const p=POS[nd.i];
+    nd.ch.forEach(c=>{
+        const cp=POS[c.i];
+        const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y);
+        cx.beginPath(); cx.moveTo(ps.sx, ps.sy+NR*sc);
+        cx.bezierCurveTo(ps.sx, (ps.sy+cs.sy)/2, cs.sx, (ps.sy+cs.sy)/2, cs.sx, cs.sy-NR*sc);
+        cx.strokeStyle="rgba(245,200,66,0.3)"; cx.lineWidth=1.5*sc; cx.stroke();
+        drawEdges(c);
     });
 }
-  
-      // الاسم فوق الدائرة
+
 function drawNodes(nd){
     const p=POS[nd.i]; const {sx,sy}=toS(p.x,p.y); const r=NR*sc;
     const isH=nd.i===HL, s = ST[nd.i];
-    cx.fillStyle="#fff"; cx.font=`bold ${Math.max(11, 13*sc)}px Tahoma`; cx.textAlign="center";
-    cx.fillText(nd.n, sx, sy - r - 12*sc);
+    
+    // رسم النص
+    cx.fillStyle="#fff"; cx.font=`bold ${Math.max(10, 13*sc)}px Tahoma`; cx.textAlign="center";
+    cx.fillText(nd.n, sx, sy - r - 10*sc);
+
+    // رسم الكرة
     cx.save();
+    cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.clip();
     if(s && s.photos && s.photos.length > 0) {
-        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.clip();
         if(!imgCache[nd.i]) { imgCache[nd.i] = new Image(); imgCache[nd.i].src = s.photos[0]; }
         try { cx.drawImage(imgCache[nd.i], sx-r, sy-r, r*2, r*2); } catch(e){}
-        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
-        cx.strokeStyle = isH ? "#fff" : "#4a90d9"; cx.lineWidth = 3*sc; cx.stroke();
     } else {
-        let col = !nd.p ? "#f5c842" : (nd.ch.length > 0 ? "#c9a84c" : "#228B22");
-        cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.fillStyle=col; cx.fill();
-        cx.strokeStyle = isH ? "#fff" : "rgba(255,255,255,0.2)"; cx.lineWidth = isH ? 4*sc : 2*sc; cx.stroke();
+        cx.fillStyle = !nd.p ? "#f5c842" : (nd.ch.length > 0 ? "#c9a84c" : "#228B22");
+        cx.fill();
     }
     cx.restore();
+
+    cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
+    cx.strokeStyle = isH ? "#fff" : "rgba(245,200,66,0.5)"; 
+    cx.lineWidth = isH ? 4*sc : 2*sc; 
+    cx.stroke();
+
     nd.ch.forEach(c=>drawNodes(c));
 }
 
 function toS(wx,wy){ return {sx:(wx-mnX+NR*2)*sc+vx, sy:(wy-mnY+NR*2)*sc+vy}; }
-
-
 
 // --- وظيفة فتح النافذة وسلسلة النسب ---
 function openMd(id){
@@ -197,68 +187,22 @@ function openMd(id){
     document.getElementById("ov").classList.add("open");
     buildGrid(id);
 }
-  
-  // --- التكبير (الماوس) ---
+
+// --- أحداث الماوس والتفاعل ---
 cw.addEventListener("wheel", e => {
     e.preventDefault();
     const rect = cw.getBoundingClientRect();
-    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const zoom = e.deltaY < 0 ? 1.1 : 0.9;
     const nextSc = Math.max(0.1, Math.min(5, sc * zoom));
-    vx = mx - (mx - vx) * (nextSc / sc); vy = my - (my - vy) * (nextSc / sc);
+    vx = (e.clientX-rect.left) - ((e.clientX-rect.left) - vx) * (nextSc / sc);
+    vy = (e.clientY-rect.top) - ((e.clientY-rect.top) - vy) * (nextSc / sc);
     sc = nextSc; render();
 }, { passive: false });
 
-
-  // --- دعم الجوال (اللمس) ---
-cw.addEventListener("touchstart", e => {
-    if (e.touches.length === 1) {
-        drag = true;
-        ds = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        vs = { x: vx, y: vy };
-    } else if (e.touches.length === 2) {
-        drag = false; // التوقف عن السحب لبدء الزوم
-        lastTouchDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-    }
-}, { passive: false });
-
-cw.addEventListener("touchmove", e => {
-    e.preventDefault();
-    if (e.touches.length === 1 && drag) {
-        vx = vs.x + (e.touches[0].clientX - ds.x);
-        vy = vs.y + (e.touches[0].clientY - ds.y);
-        render();
-    } else if (e.touches.length === 2) {
-        const dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-        const zoom = dist / lastTouchDist;
-        
-        const rect = cw.getBoundingClientRect();
-        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
-
-        const nextSc = Math.max(0.1, Math.min(5, sc * zoom));
-        vx = midX - (midX - vx) * (nextSc / sc);
-        vy = midY - (midY - vy) * (nextSc / sc);
-        
-        sc = nextSc;
-        lastTouchDist = dist;
-        render();
-    }
-}, { passive: false });
-
-cw.addEventListener("touchend", () => { drag = false; });
-  
-  
-function center(){
-    const tW=mxX-mnX+NR*4, tH=mxY-mnY+NR*4;
-    sc=Math.min(cw.clientWidth/tW, cw.clientHeight/tH, 1.5)*0.85;
-    vx=(cw.clientWidth-tW*sc)/2; vy=(cw.clientHeight-tH*sc)/2;
-    render();
-}
-
-cw.addEventListener("mousedown",e=>{ drag=true; ds={x:e.clientX,y:e.clientY}; vs={x:vx,y:vy}; });
+cw.addEventListener("mousedown",e=>{ drag=true; ds={x:e.clientX,y:e.clientY}; vs={x:vx,y:vy}; cw.style.cursor="grabbing"; });
 window.addEventListener("mousemove",e=>{ if(!drag)return; vx=vs.x+(e.clientX-ds.x); vy=vs.y+(e.clientY-ds.y); render(); });
-window.addEventListener("mouseup",()=>drag=false);
+window.addEventListener("mouseup",()=>{ drag=false; cw.style.cursor="grab"; });
+
 cw.addEventListener("click",e=>{
     if(Math.abs(e.clientX-ds.x)>5) return;
     const r=cw.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
@@ -268,14 +212,26 @@ cw.addEventListener("click",e=>{
     }
 });
 
-function openMd(id){
-    CID=id; const nd=NM[id];
-    document.getElementById("mnm").textContent=nd.n;
-    document.getElementById("tx").value = ST[id]?.info || "";
-    document.getElementById("ov").classList.add("open");
-    buildGrid(id);
+function center(){
+    const tW=mxX-mnX+NR*4, tH=mxY-mnY+NR*4;
+    sc=Math.min(cw.clientWidth/tW, cw.clientHeight/tH, 1.5)*0.85;
+    vx=(cw.clientWidth-tW*sc)/2; vy=(cw.clientHeight-tH*sc)/2;
+    render();
 }
 
+function zIn(){ sc=Math.min(5,sc*1.2); render(); }
+function zOut(){ sc=Math.max(0.1,sc*0.8); render(); }
+
+function doSearch(v){
+    HL = D.find(x=>x.n.includes(v))?.i || null;
+    if(HL) {
+        vx = cw.clientWidth/2 - (POS[HL].x - mnX + NR*2)*sc;
+        vy = cw.clientHeight/2 - (POS[HL].y - mnY + NR*2)*sc;
+    }
+    render();
+}
+
+// --- إدارة البيانات والصور ---
 function buildGrid(id) {
     const grid = document.getElementById("pg"); grid.innerHTML = "";
     ST[id]?.photos?.forEach((src, idx) => {
@@ -285,13 +241,55 @@ function buildGrid(id) {
     });
 }
 
+function addPhotos(e) {
+    const files = Array.from(e.target.files);
+    if(!ST[CID]) ST[CID] = {photos:[], info:""};
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = r => {
+            ST[CID].photos.push(r.target.result);
+            imgCache[CID] = null; 
+            buildGrid(CID);
+            render();
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
-  
+function delImg(idx) {
+    ST[CID].photos.splice(idx,1);
+    imgCache[CID] = null;
+    buildGrid(CID);
+    render();
+}
+
+function saveInfo() {
+    if(!ST[CID]) ST[CID] = {photos:[], info:""};
+    ST[CID].info = document.getElementById("tx").value;
+    toast("تم الحفظ في الذاكرة المؤقتة ✓");
+}
+
+function exportData() {
+    const blob = new Blob([JSON.stringify({family:D, storage:ST}, null, 2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="شجرة_القعير_5_8_2026.json"; a.click();
+}
+
+function importData(e) {
+    const reader = new FileReader();
+    reader.onload = r => {
+        const data = JSON.parse(r.target.result);
+        D = data.family; ST = data.storage || {};
+        imgCache = {}; buildTree(); center();
+        toast("تم استيراد البيانات بنجاح ✓");
+    };
+    reader.readAsText(e.target.files[0]);
+}
+
 function closeMd() { document.getElementById("ov").classList.remove("open"); }
-function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
+function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),3000); }
 
-  
-// تشغيل التحميل التلقائي عند البداية
+// البداية
 loadAutoData();
 window.addEventListener("resize", render);
 </script>
