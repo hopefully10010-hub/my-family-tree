@@ -265,25 +265,6 @@ function buildGrid(id) {
 }
 
 
-// --- وظيفة فتح النافذة وسلسلة النسب ---
-function openMd(id){
-    CID=id; const nd=NM[id];
-    document.getElementById("mnm").textContent=nd.n;
-
-    // تتبع النسب (Breadcrumbs)
-    let path = [];
-    let curr = nd;
-    while(curr) {
-        path.push(curr.n);
-        curr = curr.p ? NM[curr.p] : null;
-    }
-    document.getElementById("mln").textContent = path.reverse().join(" ← ");
-
-    document.getElementById("tx").value = ST[id]?.info || "";
-    document.getElementById("ov").classList.add("open");
-    buildGrid(id);
-}
-
   
 function closeMd() { document.getElementById("ov").classList.remove("open"); }
 function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2000); }
