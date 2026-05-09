@@ -45,14 +45,11 @@ canvas{position:absolute;top:0;left:0;display:block}
 
 <header>
   <h1>🌳 شجرة أسرة القعير</h1>
-  <p>نسخة الجوال واللمس المتطور</p>
+  <p>من آل بو عليان · من العناقر · من بني قيم · من التميمي</p>
 </header>
 
 <div id="tb">
   <input id="sb" type="text" placeholder="🔍 بحث..." oninput="doSearch(this.value)"/>
-  <button onclick="zIn()">➕</button>
-  <button onclick="zOut()">➖</button>
-  <button onclick="center()">🏠</button>
   <button onclick="exportData()" style="background: #2980b9; color: #fff; border:none">💾</button>
 </div>
 
@@ -78,7 +75,7 @@ canvas{position:absolute;top:0;left:0;display:block}
 <div id="ts"></div>
 
 <script>
-const NR=45, HG=140, WG=110;
+const NR=45, HG=900, WG=110;
 let D = [], ST = {}, NM = {}, ROOT = null, POS = {}, imgCache = {};
 let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null, mnX, mxX, mnY, mxY;
 let initialDist = null; // للمس بإصبعين
