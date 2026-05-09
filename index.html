@@ -10,38 +10,34 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0d0500;overflow:
 header{text-align:center;padding:14px 10px 6px}
 header h1{font-size:clamp(1.2rem,3.5vw,2rem);color:#f5c842;text-shadow:0 0 18px rgba(245,200,66,.6)}
 header p{color:#c9a84c;font-size:.8rem;margin-top:3px}
-
 /* شريط الأدوات */
-#tb{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;padding:10px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(245,200,66,0.1)}
-#tb button, #tb input{background:rgba(245,200,66,0.1);border:1px solid #f5c842;color:#f5c842;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:.8rem;outline:none; transition: 0.3s}
-#tb button:hover{background:rgba(245,200,66,0.3)}
-#sb{width:180px; color: #fff}
+#tb{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:8px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(245,200,66,0.1)}
+#tb button, #tb input{background:rgba(245,200,66,0.1);border:1px solid #f5c842;color:#f5c842;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:.75rem;outline:none; transition: 0.3s}
+#sb{width:130px; color: #fff}
 
 /* منطقة الشجرة */
 #cw{width:100%;height:calc(100vh - 140px);position:relative;overflow:hidden;cursor:grab}
 canvas{position:absolute;top:0;left:0;display:block}
 
-/* النافذة المنبثقة (المودال) */
+/* النافذة المنبثقة */
 #ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center}
 #ov.open{display:flex}
-#md{background:linear-gradient(145deg,#1e0e02,#2d1a06);border:2px solid #f5c842;border-radius:16px;width:min(500px,95vw);max-height:90vh;overflow-y:auto;padding:25px 20px;position:relative;box-shadow:0 0 35px rgba(245,200,66,0.3);animation:pop 0.2s ease}
-@keyframes pop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+#md{background:linear-gradient(145deg,#1e0e02,#2d1a06);border:2px solid #f5c842;border-radius:16px;width:min(500px,95vw);max-height:90vh;overflow-y:auto;padding:25px 20px;position:relative;box-shadow:0 0 35px rgba(245,200,66,0.3)}
 .close-btn{position:absolute;top:10px;left:15px;background:none;border:none;color:#f5c842;font-size:1.8rem;cursor:pointer}
 
-#mnm{text-align:center;font-size:1.6rem;font-weight:bold;color:#f5c842;margin-bottom:8px}
-/* تنسيق سلسلة النسب - Breadcrumbs */
-#mln{text-align:center; color:#c9a84c; font-size:0.85rem; line-height:1.6; margin-bottom:20px; direction: rtl}
+#mnm{text-align:center;font-size:1.5rem;font-weight:bold;color:#f5c842;margin-bottom:8px}
+#mln{text-align:center; color:#c9a84c; font-size:0.8rem; line-height:1.5; margin-bottom:15px}
 
-.section-label{font-size: 0.8rem; color: #c9a84c; margin-top: 15px; margin-bottom: 8px; display: block; border-bottom: 1px solid rgba(245,200,66,0.2); padding-bottom: 3px;}
-.action-btn{width:100%; padding:12px; border-radius:10px; font-size:0.9rem; cursor:pointer; margin-top:10px; border:1px solid #f5c842; transition: 0.3s; display: block; text-align: center; text-decoration: none}
+.section-label{font-size: 0.75rem; color: #c9a84c; margin-top: 15px; margin-bottom: 8px; display: block; border-bottom: 1px solid rgba(245,200,66,0.2); padding-bottom: 3px;}
+.action-btn{width:100%; padding:10px; border-radius:10px; font-size:0.85rem; cursor:pointer; margin-top:10px; border:1px solid #f5c842; display: block; text-align: center; text-decoration: none; color: inherit;}
 .save-btn{background:linear-gradient(90deg,#c9a84c,#f5c842); color:#1a0a00; border:none; font-weight:bold}
 
-#pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:10px;margin-bottom:15px}
+#pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-bottom:15px}
 .pc{position:relative;border-radius:8px;overflow:hidden;border:1px solid #f5c842;aspect-ratio:1;background:#111}
 .pc img{width:100%;height:100%;object-fit:cover}
-.db{position:absolute;top:4px;left:4px;background:rgba(220,0,0,0.9);border:none;color:#fff;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer}
+.db{position:absolute;top:4px;left:4px;background:rgba(220,0,0,0.9);border:none;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer}
 
-#ts{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#f5c842;color:#1a0a00;padding:10px 25px;border-radius:30px;font-size:0.9rem;font-weight:bold;opacity:0;transition:0.3s;z-index:2000;pointer-events:none}
+#ts{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#f5c842;color:#1a0a00;padding:8px 20px;border-radius:30px;font-size:0.8rem;font-weight:bold;opacity:0;transition:0.3s;z-index:2000;pointer-events:none}
 #ts.show{opacity:1}
 </style>
 </head>
@@ -49,17 +45,15 @@ canvas{position:absolute;top:0;left:0;display:block}
 
 <header>
   <h1>🌳 شجرة أسرة القعير</h1>
-  <p>نظام العرض ثنائي الأبعاد المتطور</p>
+  <p>نسخة الجوال واللمس المتطور</p>
 </header>
 
 <div id="tb">
-  <input id="sb" type="text" placeholder="🔍 بحث عن اسم..." oninput="doSearch(this.value)"/>
-  <button onclick="zIn()">➕ تكبير</button>
-  <button onclick="zOut()">➖ تصغير</button>
-  <button onclick="center()">🏠 ضبط</button>
-  <button onclick="exportData()" style="background: #2980b9; color: #fff; border:none">💾 حفظ النسخة</button>
-  <button onclick="document.getElementById('importFile').click()" style="background: #8e44ad; color: #fff; border:none">📂 استيراد JSON</button>
-  <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none"/>
+  <input id="sb" type="text" placeholder="🔍 بحث..." oninput="doSearch(this.value)"/>
+  <button onclick="zIn()">➕</button>
+  <button onclick="zOut()">➖</button>
+  <button onclick="center()">🏠</button>
+  <button onclick="exportData()" style="background: #2980b9; color: #fff; border:none">💾</button>
 </div>
 
 <div id="cw"><canvas id="cv"></canvas></div>
@@ -72,12 +66,12 @@ canvas{position:absolute;top:0;left:0;display:block}
     
     <span class="section-label">معرض الصور</span>
     <div id="pg"></div>
-    <button class="action-btn" style="background:rgba(245,200,66,0.1); border-style:dashed" onclick="document.getElementById('fi').click()">📷 إضافة صور جديدة</button>
+    <button class="action-btn" style="background:rgba(245,200,66,0.1); border-style:dashed" onclick="document.getElementById('fi').click()">📷 إضافة صور</button>
     <input type="file" id="fi" accept="image/*" multiple onchange="addPhotos(event)" style="display:none"/>
     
-    <span class="section-label">المعلومات الشخصية والسيرة</span>
-    <textarea id="tx" style="width:100%; height:100px; background:#111; color:#fff; border:1px solid #444; border-radius:8px; padding:10px; font-family:inherit" placeholder="اكتب سيرة الشخص هنا..."></textarea>
-    <button class="action-btn save-btn" onclick="saveInfo()">💾 حفظ التعديلات</button>
+    <span class="section-label">السيرة الذاتية</span>
+    <textarea id="tx" style="width:100%; height:80px; background:#111; color:#fff; border:1px solid #444; border-radius:8px; padding:10px;" placeholder="اكتب هنا..."></textarea>
+    <button class="action-btn save-btn" onclick="saveInfo()">💾 حفظ</button>
   </div>
 </div>
 
@@ -87,24 +81,22 @@ canvas{position:absolute;top:0;left:0;display:block}
 const NR=45, HG=140, WG=110;
 let D = [], ST = {}, NM = {}, ROOT = null, POS = {}, imgCache = {};
 let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null, mnX, mxX, mnY, mxY;
+let initialDist = null; // للمس بإصبعين
 
 const cw=document.getElementById("cw"), cv=document.getElementById("cv"), cx=cv.getContext("2d");
 
-// --- تحميل البيانات تلقائياً ---
 async function loadAutoData() {
     try {
         const response = await fetch('شجرة_القعير_5_8_2026.json');
         if (!response.ok) throw new Error();
         const data = await response.json();
-        D = data.family;
-        ST = data.storage || {};
-        toast("تمت مزامنة البيانات تلقائياً ✓");
+        D = data.family; ST = data.storage || {};
+        toast("تمت المزامنة ✓");
     } catch (e) {
-        toast("يرجى اختيار ملف JSON للاستيراد");
+        toast("يرجى استيراد ملف JSON");
         D = [{i:"T0",n:"التميمي",p:null}]; 
     }
-    buildTree();
-    center();
+    buildTree(); center();
 }
 
 function buildTree() {
@@ -115,9 +107,7 @@ function buildTree() {
         if (x.p && NM[x.p]) NM[x.p].ch.push(NM[x.i]);
         else if (!x.p) ROOT = NM[x.i];
     });
-    layout(ROOT, 0, 0);
-    calcBounds();
-    render();
+    layout(ROOT, 0, 0); calcBounds(); render();
 }
 
 function layout(nd, d, l){
@@ -159,12 +149,8 @@ function drawEdges(nd){
 function drawNodes(nd){
     const p=POS[nd.i]; const {sx,sy}=toS(p.x,p.y); const r=NR*sc;
     const isH=nd.i===HL, s = ST[nd.i];
-    
-    // رسم النص
-    cx.fillStyle="#fff"; cx.font=`bold ${Math.max(10, 13*sc)}px Tahoma`; cx.textAlign="center";
-    cx.fillText(nd.n, sx, sy - r - 10*sc);
-
-    // رسم الكرة
+    cx.fillStyle="#fff"; cx.font=`bold ${Math.max(10, 12*sc)}px Tahoma`; cx.textAlign="center";
+    cx.fillText(nd.n, sx, sy - r - 8*sc);
     cx.save();
     cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.clip();
     if(s && s.photos && s.photos.length > 0) {
@@ -175,37 +161,76 @@ function drawNodes(nd){
         cx.fill();
     }
     cx.restore();
-
     cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2);
-    cx.strokeStyle = isH ? "#fff" : "rgba(245,200,66,0.5)"; 
-    cx.lineWidth = isH ? 4*sc : 2*sc; 
-    cx.stroke();
-
+    cx.strokeStyle = isH ? "#fff" : "rgba(245,200,66,0.5)"; cx.lineWidth = isH ? 4*sc : 2*sc; cx.stroke();
     nd.ch.forEach(c=>drawNodes(c));
 }
 
 function toS(wx,wy){ return {sx:(wx-mnX+NR*2)*sc+vx, sy:(wy-mnY+NR*2)*sc+vy}; }
 
-// --- وظيفة فتح النافذة وسلسلة النسب ---
 function openMd(id){
     CID=id; const nd=NM[id];
     document.getElementById("mnm").textContent=nd.n;
-
-    // تتبع النسب (Breadcrumbs)
-    let path = [];
-    let curr = nd;
-    while(curr) {
-        path.push(curr.n);
-        curr = curr.p ? NM[curr.p] : null;
-    }
+    let path = []; let curr = nd;
+    while(curr) { path.push(curr.n); curr = curr.p ? NM[curr.p] : null; }
     document.getElementById("mln").textContent = path.reverse().join(" ← ");
-
     document.getElementById("tx").value = ST[id]?.info || "";
     document.getElementById("ov").classList.add("open");
     buildGrid(id);
 }
 
-// --- أحداث الماوس والتفاعل ---
+// --- نظام اللمس (Touch Logic) للجوال ---
+
+cw.addEventListener("touchstart", e => {
+    if (e.touches.length === 1) {
+        drag = true;
+        ds = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        vs = { x: vx, y: vy };
+    } else if (e.touches.length === 2) {
+        drag = false;
+        initialDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    }
+}, { passive: false });
+
+cw.addEventListener("touchmove", e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && drag) {
+        vx = vs.x + (e.touches[0].clientX - ds.x);
+        vy = vs.y + (e.touches[0].clientY - ds.y);
+        render();
+    } else if (e.touches.length === 2 && initialDist) {
+        const currentDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        const zoom = currentDist / initialDist;
+        const nextSc = Math.max(0.1, Math.min(5, sc * zoom));
+        
+        // التكبير من منتصف المسافة بين الإصبعين
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        const rect = cw.getBoundingClientRect();
+        
+        vx = (midX - rect.left) - ((midX - rect.left) - vx) * (nextSc / sc);
+        vy = (midY - rect.top) - ((midY - rect.top) - vy) * (nextSc / sc);
+        
+        sc = nextSc;
+        initialDist = currentDist;
+        render();
+    }
+}, { passive: false });
+
+cw.addEventListener("touchend", e => {
+    if (drag && Math.abs(e.changedTouches[0].clientX - ds.x) < 5) {
+        // إذا كانت حركة بسيطة جداً، نعتبرها نقرة
+        const rect = cw.getBoundingClientRect();
+        const mx = e.changedTouches[0].clientX - rect.left, my = e.changedTouches[0].clientY - rect.top;
+        for (const id in POS) {
+            const { sx, sy } = toS(POS[id].x, POS[id].y);
+            if (Math.hypot(mx - sx, my - sy) <= NR * sc + 15) { openMd(id); break; }
+        }
+    }
+    drag = false; initialDist = null;
+});
+
+// --- بقية الأكواد للماوس كما هي ---
 cw.addEventListener("wheel", e => {
     e.preventDefault();
     const rect = cw.getBoundingClientRect();
@@ -216,29 +241,25 @@ cw.addEventListener("wheel", e => {
     sc = nextSc; render();
 }, { passive: false });
 
-cw.addEventListener("mousedown",e=>{ drag=true; ds={x:e.clientX,y:e.clientY}; vs={x:vx,y:vy}; cw.style.cursor="grabbing"; });
+cw.addEventListener("mousedown",e=>{ drag=true; ds={x:e.clientX,y:e.clientY}; vs={x:vx,y:vy}; });
 window.addEventListener("mousemove",e=>{ if(!drag)return; vx=vs.x+(e.clientX-ds.x); vy=vs.y+(e.clientY-ds.y); render(); });
-window.addEventListener("mouseup",()=>{ drag=false; cw.style.cursor="grab"; });
-
+window.addEventListener("mouseup",()=>drag=false);
 cw.addEventListener("click",e=>{
     if(Math.abs(e.clientX-ds.x)>5) return;
     const r=cw.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
     for(const id in POS){
         const {sx,sy}=toS(POS[id].x, POS[id].y);
-        if(Math.hypot(mx-sx, my-sy) <= NR*sc+5){ openMd(id); return; }
+        if(Math.hypot(mx-sx, my-sy) <= NR*sc+10){ openMd(id); return; }
     }
 });
 
 function center(){
     const tW=mxX-mnX+NR*4, tH=mxY-mnY+NR*4;
     sc=Math.min(cw.clientWidth/tW, cw.clientHeight/tH, 1.5)*0.85;
-    vx=(cw.clientWidth-tW*sc)/2; vy=(cw.clientHeight-tH*sc)/2;
-    render();
+    vx=(cw.clientWidth-tW*sc)/2; vy=(cw.clientHeight-tH*sc)/2; render();
 }
-
 function zIn(){ sc=Math.min(5,sc*1.2); render(); }
 function zOut(){ sc=Math.max(0.1,sc*0.8); render(); }
-
 function doSearch(v){
     HL = D.find(x=>x.n.includes(v))?.i || null;
     if(HL) {
@@ -247,8 +268,6 @@ function doSearch(v){
     }
     render();
 }
-
-// --- إدارة البيانات والصور ---
 function buildGrid(id) {
     const grid = document.getElementById("pg"); grid.innerHTML = "";
     ST[id]?.photos?.forEach((src, idx) => {
@@ -257,56 +276,30 @@ function buildGrid(id) {
         grid.appendChild(div);
     });
 }
-
 function addPhotos(e) {
     const files = Array.from(e.target.files);
     if(!ST[CID]) ST[CID] = {photos:[], info:""};
     files.forEach(file => {
         const reader = new FileReader();
-        reader.onload = r => {
-            ST[CID].photos.push(r.target.result);
-            imgCache[CID] = null; 
-            buildGrid(CID);
-            render();
-        };
+        reader.onload = r => { ST[CID].photos.push(r.target.result); buildGrid(CID); render(); };
         reader.readAsDataURL(file);
     });
 }
-
-function delImg(idx) {
-    ST[CID].photos.splice(idx,1);
-    imgCache[CID] = null;
-    buildGrid(CID);
-    render();
-}
-
-function saveInfo() {
-    if(!ST[CID]) ST[CID] = {photos:[], info:""};
-    ST[CID].info = document.getElementById("tx").value;
-    toast("تم الحفظ في الذاكرة المؤقتة ✓");
-}
-
+function delImg(idx) { ST[CID].photos.splice(idx,1); buildGrid(CID); render(); }
+function saveInfo() { if(!ST[CID]) ST[CID] = {photos:[], info:""}; ST[CID].info = document.getElementById("tx").value; toast("تم الحفظ ✓"); }
 function exportData() {
     const blob = new Blob([JSON.stringify({family:D, storage:ST}, null, 2)], {type:"application/json"});
     const a = document.createElement("a"); a.href=URL.createObjectURL(blob);
     a.download="شجرة_القعير_5_8_2026.json"; a.click();
 }
-
 function importData(e) {
     const reader = new FileReader();
-    reader.onload = r => {
-        const data = JSON.parse(r.target.result);
-        D = data.family; ST = data.storage || {};
-        imgCache = {}; buildTree(); center();
-        toast("تم استيراد البيانات بنجاح ✓");
-    };
+    reader.onload = r => { const data = JSON.parse(r.target.result); D = data.family; ST = data.storage || {}; buildTree(); center(); };
     reader.readAsText(e.target.files[0]);
 }
-
 function closeMd() { document.getElementById("ov").classList.remove("open"); }
 function toast(m){ const t=document.getElementById("ts"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),3000); }
 
-// البداية
 loadAutoData();
 window.addEventListener("resize", render);
 </script>
