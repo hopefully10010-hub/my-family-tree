@@ -182,7 +182,7 @@ function openMd(id){
     document.getElementById("mnm").textContent=nd.n;
     let path = []; let curr = nd;
     while(curr) { path.push(curr.n); curr = curr.p ? NM[curr.p] : null; }
-    document.getElementById("mln").textContent = path.reverse().join(" ← ");
+    document.getElementById("mln").textContent = path.reverse().join(" <- ");
     document.getElementById("tx").value = ST[id]?.info || "";
     document.getElementById("ov").classList.add("open");
     buildGrid(id);
