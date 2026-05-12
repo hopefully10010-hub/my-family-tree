@@ -128,15 +128,30 @@ function render(){
     if(ROOT) { drawEdges(ROOT); drawNodes(ROOT); }
 }
 
+
 function drawEdges(nd){
-    const p=POS[nd.i];
-    nd.ch.forEach(c=>{
-        const cp=POS[c.i];
-        const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y);
-        cx.beginPath(); cx.moveTo(ps.sx, ps.sy+NR*sc);
-        cx.bezierCurveTo(ps.sx, (ps.sy+cs.sy)/2, cs.sx, (ps.sy+cs.sy)/2, cs.sx, cs.sy-NR*sc);
-        cx.strokeStyle="rgba(245,200,66,0.3)"; cx.lineWidth=1.5*sc; cx.stroke();
-        drawEdges(c);
+    const p=POS[nd.i]; // إحداثيات الأب
+    nd.ch.forEach(c=>{ // لكل ابن موجود في مصفوفة الأبناء
+        const cp=POS[c.i]; // إحداثيات الابن
+        const ps=toS(p.x,p.y), cs=toS(cp.x,cp.y); // تحويل الإحداثيات لتناسب الزوم والمكان الحالي
+
+        cx.beginPath(); 
+        // 1. نقطة البداية: من منتصف أسفل دائرة الأب
+        cx.moveTo(ps.sx, ps.sy + NR * sc); 
+
+        // 2. رسم المنحنى (Bezier Curve) ليعطي شكل "عضوي" وانسيابي
+        cx.bezierCurveTo(
+            ps.sx, (ps.sy + cs.sy) / 2, // نقطة التحكم الأولى
+            cs.sx, (ps.sy + cs.sy) / 2, // نقطة التحكم الثانية
+            cs.sx, cs.sy - NR * sc      // نقطة النهاية (أعلى دائرة الابن)
+        );
+
+        // 3. خصائص الخط (اللون والسمك)
+        cx.strokeStyle = "rgba(245,200,66,0.18)"; // لون الخط (ذهبي شفاف)
+        cx.lineWidth = Math.max(1, 15 * sc);     // سمك الخط (يتغير مع الزوم)
+        
+        cx.stroke(); // تنفيذ الرسم
+        drawEdges(c); // تكرار العملية لأبناء الابن (الاستدعاء الذاتي)
     });
 }
 
