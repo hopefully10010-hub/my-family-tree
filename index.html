@@ -148,7 +148,7 @@ function drawEdges(nd){
 
         // 3. خصائص الخط (اللون والسمك)
         cx.strokeStyle = "rgba(245,200,66,0.18)"; // لون الخط (ذهبي شفاف)
-        cx.lineWidth = Math.max(1, 15 * sc);     // سمك الخط (يتغير مع الزوم)
+        cx.lineWidth = Math.max(4, 15 * sc);     // سمك الخط (يتغير مع الزوم)
         
         cx.stroke(); // تنفيذ الرسم
         drawEdges(c); // تكرار العملية لأبناء الابن (الاستدعاء الذاتي)
