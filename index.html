@@ -7,6 +7,28 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0d0500;overflow:hidden;color:#fff}
+
+
+/* تنسيق الهيدر مع الشعار */
+header{text-align:center ;padding:14px 10px 6px}
+header h1 {
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 15px;
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    color: #e4b44d00;
+    text-shadow: 0 0 18px rgb(224, 191, 82);
+}
+.header-logo {
+    height: 90px; 
+ 
+    width: auto; 
+    filter: drop-shadow(0 0 10px rgba(243, 190, 74, 0.247));
+}
+header p{color:#f1cb4d00;font-size:.75rem;margin-top:3px}
+
+  
 header{text-align:center;padding:14px 10px 6px}
 header h1{font-size:clamp(1.2rem,3.5vw,2rem);color:#f5c842;text-shadow:0 0 18px rgba(245,200,66,.6)}
 header p{color:#c9a84c;font-size:.8rem;margin-top:3px}
@@ -43,7 +65,10 @@ canvas{position:absolute;top:0;left:0;display:block}
 <body>
 
 <header>
-  <h1>🌳 شجرة أسرة القعير</h1>
+<h1>
+    <img  alt="شعار" class="header-logo" src="logo.png" >
+    شجرة أسرة القعير
+  </h1>
   <p>من آل بو عليان · من العناقر · من بني تميم  · </p>
 </header>
 
