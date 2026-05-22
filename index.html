@@ -8,7 +8,72 @@
 *{box-sizing:border-box;margin:0;padding:0}       /* تغيير الخلفية vvvvv    ايضا صطر 152*/
 body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0d0500;overflow:hidden;color:#fff}
                                                   /* تغيير الخلفية ^^^^ */
+/* --- شاشة الترحيب والمقدمة --- */
+#welcome-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(145deg, #2d1a06, #1e0e02);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+/* عندما تختفي الشاشة الترحيبية */
+#welcome-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.05);
+}
+.welcome-basmala {
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    color: #f5c842;
+    margin-bottom: 25px;
+    font-family: 'Traditional Arabic', 'Segoe UI', sans-serif;
+    text-shadow: 0 0 10px rgba(245,200,66,0.3);
+}
+.welcome-logo {
+    height: 120px;
+    width: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(245, 200, 66, 0.4));
+}
+.welcome-title {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    color: #f5c842;
+    margin-bottom: 15px;
+    text-shadow: 0 0 15px rgba(245,200,66,0.5);
+}
+.welcome-msg {
+    font-size: clamp(0.9rem, 3vw, 1.2rem);
+    color: #c9a84c;
+    max-width: 600px;
+    line-height: 1.8;
+    margin-bottom: 40px;
+}
+.welcome-btn {
+    background: linear-gradient(90deg, #c9a84c, #f5c842);
+    color: #1a0a00;
+    border: none;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(245,200,66,0.3);
+    transition: 0.3s ease;
+    outline: none;
+}
+.welcome-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(245,200,66,0.5);
+}
 
+
+header p{color:#c9a84c;font-size:.75rem;margin-top:3px}
 /* تنسيق الهيدر مع الشعار */
 header{text-align:center ;padding:14px 10px 6px}
 header h1 {
@@ -64,6 +129,17 @@ canvas{position:absolute;top:0;left:0;display:block}
 </head>
 <body>
 
+<div id="welcome-screen">
+    <div class="welcome-basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <img src="logo.png" alt="شعار الأسرة" class="welcome-logo">
+    <h2 class="welcome-title">أهلاً بكم في شجرة أسرة القعير</h2>
+    <p class="welcome-msg">
+        مرحباً بكم في المنصة الرقمية  لأسرة القعير العريقة. 
+        هنا نلتقي لنستعرض تاريخنا المشرف، ونصل أرحامنا، ونوثق سيرة أجدادنا وآبائنا لتظل نبراساً يضيء طريق الأجيال القادمة.
+    </p>
+    <button class="welcome-btn" onclick="startApp()">🚪 الانتقال إلى الشجرة</button>
+</div>
+
 <header>
 <h1>
     <img  alt="شعار" class="header-logo" src="logo.png" >
@@ -104,9 +180,16 @@ let initialDist = null; // للمس بإصبعين
 
 const cw=document.getElementById("cw"), cv=document.getElementById("cv"), cx=cv.getContext("2d");
 
+
+// --- دالة تشغيل وإخفاء شاشة الترحيب ---
+function startApp() {
+    const screen = document.getElementById("welcome-screen");
+    screen.classList.add("fade-out");
+}
+
 async function loadAutoData() {
     try {
-        const response = await fetch('شجرة_القعير_5_8_2026.json');
+        const response = await fetch('شجرة_القعير_5_8_2026.json');   // --- عشان يجلب الملف اللي فيه الصور---
         if (!response.ok) throw new Error();
         const data = await response.json();
         D = data.family; ST = data.storage || {};
