@@ -6,7 +6,7 @@
 <title>شجرة أسرة القعير - النسخة الرسمية </title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}       /* تغيير الخلفية vvvvv    ايضا صطر 152*/
-body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#0d0500;overflow:hidden;color:#fff}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#815411;overflow:hidden;color:#fff}
                                                   /* تغيير الخلفية ^^^^ */
 /* --- شاشة الترحيب والمقدمة --- */
 #welcome-screen {
@@ -100,8 +100,8 @@ header{text-align:center;padding:14px 10px 6px}
 header h1{font-size:clamp(1.2rem,3.5vw,2rem);color:#f5c842;text-shadow:0 0 18px rgba(245,200,66,.6)}
 header p{color:#c9a84c;font-size:.8rem;margin-top:3px}
 /* شريط الأدوات */
-#tb{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:8px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(245,200,66,0.1)}
-#tb button, #tb input{background:rgba(245,200,66,0.1);border:1px solid #f5c842;color:#f5c842;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:.75rem;outline:none; transition: 0.3s}
+#tb{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;padding:8px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(245, 200, 66, 0.836)}
+#tb button, #tb input{background:rgba(245, 200, 66, 0.274);border:1px solid #f5c842;color:#f5c842;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:.75rem;outline:none; transition: 0.3s}
 #sb{width:130px; color: #fff}
 
 /* منطقة الشجرة */
@@ -234,7 +234,7 @@ function calcBounds() {
 
 function render(){
     cv.width=cw.clientWidth; cv.height=cw.clientHeight;
-    cx.fillStyle = "#5c4331"; cx.fillRect(0,0,cv.width,cv.height);   /* تغيير الخلفية ^^^^ */
+    cx.fillStyle = "#815411"; cx.fillRect(0,0,cv.width,cv.height);   /* تغيير الخلفية ^^^^ */
     if(ROOT) { drawEdges(ROOT); drawNodes(ROOT); }
 }
 
