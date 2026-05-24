@@ -7,7 +7,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}       /* تغيير الخلفية vvvvv    ايضا صطر 152*/
 body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#815411;overflow:hidden;color:#fff}
-                                                  /* تغيير الخلفية ^^^^ */
+                                                 /* تغيير الخلفية ^^^^ */
 /* --- شاشة الترحيب والمقدمة --- */
 #welcome-screen {
     position: fixed;
@@ -42,7 +42,7 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#815411;overflow:
     filter: drop-shadow(0 0 15px rgba(245, 200, 66, 0.4));
 }
 .welcome-title {
-    font-size: clamp(1.2rem, 2vw, 4rem);
+    font-size: clamp(1.5rem, 3vw, 4rem);
     color: #f5c842;
     margin-bottom: 15px;
       font-family: 'Traditional Arabic', 'Segoe UI', sans-serif;
@@ -73,7 +73,6 @@ body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#815411;overflow:
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(245,200,66,0.5);
 }
-
 
 header p{color:#c9a84c;font-size:.75rem;margin-top:3px}
 /* تنسيق الهيدر مع الشعار */
@@ -175,7 +174,7 @@ canvas{position:absolute;top:0;left:0;display:block}
 <div id="ts"></div>
 
 <script>
-const NR=30, HG=900, WG=30;
+const NR=65, HG=900, WG=30;
 let D = [], ST = {}, NM = {}, ROOT = null, POS = {}, imgCache = {};
 let vx=0, vy=0, sc=1, drag=false, ds={x:0,y:0}, vs={x:0,y:0}, HL=null, CID=null, mnX, mxX, mnY, mxY;
 let initialDist = null; // للمس بإصبعين
@@ -258,7 +257,7 @@ function drawEdges(nd){
 
         // 3. خصائص الخط (اللون والسمك)
         cx.strokeStyle = "#ffffff"; // لون الخط (ذهبي شفاف)
-        cx.lineWidth = Math.max( 4, 4 * sc);     // سمك الخط (يتغير مع الزوم)
+        cx.lineWidth = Math.max( 3, 3 * sc);     // سمك الخط (يتغير مع الزوم)
         
         cx.stroke(); // تنفيذ الرسم
         drawEdges(c); // تكرار العملية لأبناء الابن (الاستدعاء الذاتي)
@@ -269,14 +268,11 @@ function drawNodes(nd){
     const p=POS[nd.i]; const {sx,sy}=toS(p.x,p.y); const r=NR*sc;
     const isH=nd.i===HL, s = ST[nd.i];
   cx.fillStyle = "#f5c842"; // لون الأسماء (هنا اخترنا الذهبي)
-cx.shadowColor = "rgba(0, 0, 0, 1)"; // لون الظل (أسود)
-cx.shadowBlur = 4; // قوة تشتت الظل
+cx.shadowColor = "rgba(1, 1, 1, 1)"; // لون الظل (أسود)
+cx.shadowBlur = 9; // قوة تشتت الظل
 cx.font = `bold ${Math.max(10, 12*sc)}px Tahoma`; 
 cx.textAlign = "center";
 cx.fillText(nd.n, sx, sy - r - 8*sc);
-
-// إعادة تعيين الظل إلى صفر حتى لا يؤثر على الدوائر والخطوط الأخرى
-cx.shadowBlur = 0;
 
     cx.save();
     cx.beginPath(); cx.arc(sx,sy,r,0,Math.PI*2); cx.clip();
